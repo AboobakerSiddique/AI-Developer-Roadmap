@@ -1,8 +1,4 @@
-#for i in range(2):
-  #  for j in range(3):
-  #      print("#", end="")
-  #  print()
-  
+4
 print("---------Rectangle Generator-----------")
 rows = int(input("No of rows: "))
 columns = int(input("No of columns: "))
