@@ -1,6 +1,5 @@
 import os
 folder = os.path.dirname(os.path.abspath(__file__))
-print("Folder path:", folder)
 print("------------- Notes App -------------")
 
 
