@@ -1,15 +1,17 @@
 import os
-
-# Get the folder where this Python script is located
-folder = os.path.dirname(__file__)
-
+folder = os.path.dirname(os.path.abspath(__file__))
+print("Folder path:", folder)
 print("------------- Notes App -------------")
+
 
 def add_note():
     note_name = input("Enter the note name: ")
     note_content = input("Enter the note content: ")
 
-    with open(note_name + ".txt", "a") as file:
+    # Create the complete file path
+    filepath = os.path.join(folder, note_name + ".txt")
+
+    with open(filepath, "a") as file:
         file.write(note_content + "\n")
 
     print("✅ Note added successfully!\n")
@@ -18,7 +20,10 @@ def add_note():
 def view_notes():
     note_name = input("Enter the note name to view: ")
 
-    with open(note_name + ".txt", "r") as file:
+    # Create the complete file path
+    filepath = os.path.join(folder, note_name + ".txt")
+
+    with open(filepath, "r") as file:
         print("\n--------", note_name.title(), "--------")
         print(file.read())
         print("------------------------------------\n")
@@ -46,6 +51,3 @@ while True:
 
     else:
         print("❌ Invalid option. Please try again.\n")
-        
-        
-    
