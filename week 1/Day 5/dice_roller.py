@@ -6,7 +6,7 @@ while True:
     if play_again == "n":
         print("Thank you for using the Dice Roller.")
         break
-    elif choice != "y":
+    elif play_again != "y":
         print("Please enter 'y' or 'n'.")
         continue
     try:
