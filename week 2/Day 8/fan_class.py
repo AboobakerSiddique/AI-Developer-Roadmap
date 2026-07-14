@@ -55,4 +55,3 @@ print(fan1)
 fan1.increase_speed()
 print(fan1)   
         
-        
