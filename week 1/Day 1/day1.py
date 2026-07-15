@@ -1,2 +1,6 @@
 print("Hello Abu")
 print("week 1 starts")
+a = int(input())
+b = int(input())
+print(a // b)
+print(a / b)
