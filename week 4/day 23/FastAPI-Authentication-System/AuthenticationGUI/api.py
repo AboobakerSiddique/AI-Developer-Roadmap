@@ -27,22 +27,13 @@ def register(username, email, password):
 # Login
 # ----------------------------
 def login(username, password):
-
-    data = {
-        "username": username,
-        "password": password
-    }
-
     response = requests.post(
         f"{BASE_URL}/login",
-        data=data
+        json={
+            "username": username,
+            "password": password
+        }
     )
-
-    if response.status_code == 200:
-
-        token = response.json()["access_token"]
-
-        config.TOKEN = token
 
     return response
 

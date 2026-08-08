@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 
 import api
+import config
 import theme
 from windows import Card, RoundedButton, FieldEntry, VaultMark
 
@@ -17,14 +18,24 @@ class LoginWindow:
         self.frame.pack(fill="both", expand=True)
 
         self.card = Card(self.frame, padding=28)
-        self.card.place(relx=0.5, rely=0.5, anchor="center", width=400, height=560)
+        self.card.place(
+            relx=0.5,
+            rely=0.5,
+            anchor="center",
+            width=400,
+            height=560
+        )
 
         content = self.card.inner
 
         # -----------------------------
-        # Header / signature mark
+        # Header
         # -----------------------------
-        VaultMark(content, size=56).pack(pady=(0, 12))
+
+        VaultMark(
+            content,
+            size=56
+        ).pack(pady=(0, 12))
 
         tk.Label(
             content,
@@ -45,20 +56,51 @@ class LoginWindow:
         # -----------------------------
         # Fields
         # -----------------------------
-        self.username_field = FieldEntry(content, "Username", icon="👤")
-        self.username_field.pack(fill="x", pady=6)
 
-        self.email_field = FieldEntry(content, "Email (register only)", icon="✉")
-        self.email_field.pack(fill="x", pady=6)
+        self.username_field = FieldEntry(
+            content,
+            "Username",
+            icon="👤"
+        )
+        self.username_field.pack(
+            fill="x",
+            pady=6
+        )
 
-        self.password_field = FieldEntry(content, "Password", icon="🔒", show="*")
-        self.password_field.pack(fill="x", pady=6)
+        self.email_field = FieldEntry(
+            content,
+            "Email (register only)",
+            icon="✉"
+        )
+        self.email_field.pack(
+            fill="x",
+            pady=6
+        )
+
+        self.password_field = FieldEntry(
+            content,
+            "Password",
+            icon="🔒",
+            show="*"
+        )
+        self.password_field.pack(
+            fill="x",
+            pady=6
+        )
 
         # -----------------------------
         # Buttons
         # -----------------------------
-        button_row = tk.Frame(content, bg=theme.SURFACE)
-        button_row.pack(fill="x", pady=(24, 0))
+
+        button_row = tk.Frame(
+            content,
+            bg=theme.SURFACE
+        )
+
+        button_row.pack(
+            fill="x",
+            pady=(24, 0)
+        )
 
         RoundedButton(
             button_row,
@@ -79,6 +121,10 @@ class LoginWindow:
             variant="ghost"
         ).pack(side="right")
 
+        # -----------------------------
+        # Status
+        # -----------------------------
+
         self.status = tk.Label(
             content,
             text="",
@@ -86,11 +132,14 @@ class LoginWindow:
             fg=theme.TEXT_FAINT,
             font=theme.FONT_SMALL
         )
-        self.status.pack(pady=(16, 0))
 
-    # ----------------------------
-    # Login
-    # ----------------------------
+        self.status.pack(
+            pady=(16, 0)
+        )
+
+    # ============================================================
+    # LOGIN
+    # ============================================================
 
     def login(self):
 
@@ -103,9 +152,14 @@ class LoginWindow:
                 "Missing Data",
                 "Enter username and password."
             )
+
             return
 
-        self.status.config(text="Authenticating…", fg=theme.TEXT_MUTED)
+        self.status.config(
+            text="Authenticating…",
+            fg=theme.TEXT_MUTED
+        )
+
         self.root.update_idletasks()
 
         response = api.login(
@@ -113,31 +167,81 @@ class LoginWindow:
             password
         )
 
+        # --------------------------------------------------------
+        # SUCCESS
+        # --------------------------------------------------------
+
         if response.status_code == 200:
 
-            self.status.config(text="Login successful.", fg=theme.TEAL)
+            try:
 
+                data = response.json()
+
+                access_token = data.get("access_token")
+
+                if not access_token:
+
+                    raise ValueError(
+                        "No access token received from server."
+                    )
+
+                # IMPORTANT:
+                # Store JWT globally so all authenticated
+                # API requests can use it.
+                config.TOKEN = access_token
+
+            except Exception as e:
+
+                self.status.config(
+                    text="Invalid server response.",
+                    fg=theme.DANGER
+                )
+
+                messagebox.showerror(
+                    "Login Error",
+                    f"Could not read access token.\n\n{e}"
+                )
+
+                return
+
+            self.status.config(
+                text="Login successful.",
+                fg=theme.TEAL
+            )
+
+            # Remove login screen
             self.frame.destroy()
 
+            # Open dashboard
             self.on_login_success()
+
+        # --------------------------------------------------------
+        # FAILURE
+        # --------------------------------------------------------
 
         else:
 
             try:
+
                 detail = response.json()["detail"]
+
             except Exception:
+
                 detail = response.text
 
-            self.status.config(text="Login failed.", fg=theme.DANGER)
+            self.status.config(
+                text="Login failed.",
+                fg=theme.DANGER
+            )
 
             messagebox.showerror(
                 "Login Failed",
                 detail
             )
 
-    # ----------------------------
-    # Register
-    # ----------------------------
+    # ============================================================
+    # REGISTER
+    # ============================================================
 
     def register(self):
 
@@ -151,6 +255,7 @@ class LoginWindow:
                 "Missing Data",
                 "Fill all fields."
             )
+
             return
 
         response = api.register(
@@ -169,16 +274,25 @@ class LoginWindow:
             self.email_field.clear()
             self.password_field.clear()
 
-            self.status.config(text="Account created — please log in.", fg=theme.TEAL)
+            self.status.config(
+                text="Account created — please log in.",
+                fg=theme.TEAL
+            )
 
         else:
 
             try:
+
                 detail = response.json()["detail"]
+
             except Exception:
+
                 detail = response.text
 
-            self.status.config(text="Registration failed.", fg=theme.DANGER)
+            self.status.config(
+                text="Registration failed.",
+                fg=theme.DANGER
+            )
 
             messagebox.showerror(
                 "Registration Failed",

@@ -1,52 +1,98 @@
-# 🔐 Authentication API using FastAPI
+# 🔐 Authentication API — FastAPI
 
-> A secure user authentication system built with **FastAPI**, featuring **password hashing**, **JWT authentication**, **protected routes**, and **SQLite** database.
+> A complete JWT-based authentication REST API built with **FastAPI**, featuring secure password hashing, JWT authentication, protected routes, SQLAlchemy ORM, SQLite, environment-based configuration, logging, and user account management.
 
-![Python](https://img.shields.io/badge/Python-3.13-blue?logo=python)
-![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688?logo=fastapi)
-![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?logo=sqlite)
-![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-ORM-red)
-![JWT](https://img.shields.io/badge/JWT-Authentication-orange)
-![License](https://img.shields.io/badge/License-MIT-green)
+🚀 Built as part of my **AI Developer Roadmap** to develop practical backend and API development skills.
 
 ---
 
 ## 📖 Overview
 
-This project demonstrates a complete authentication workflow using **FastAPI**.
+This project is a complete backend authentication system built using **FastAPI**.
 
-It includes secure user registration, password hashing using **bcrypt**, JWT token generation, token verification, and protected API endpoints.
+It implements the core authentication workflow used in modern applications:
 
-This project was built as part of my **AI Developer Roadmap** to strengthen my backend development and authentication fundamentals.
+```text
+Registration
+     ↓
+Password Hashing
+     ↓
+Database
+     ↓
+Login
+     ↓
+Password Verification
+     ↓
+JWT Generation
+     ↓
+Protected API
+     ↓
+Authenticated User
+```
+
+The API is also consumed by a separate **Tkinter Desktop GUI**, allowing users to interact with the backend through a graphical interface instead of directly using API documentation.
 
 ---
 
 # ✨ Features
 
+## 🔐 Authentication
+
 - 👤 User Registration
 - 🔑 Password Hashing with bcrypt
-- 🔒 Secure Password Verification
+- 🔒 Password Verification
 - 🎫 JWT Access Token Generation
+- ⏳ JWT Token Expiration
 - 🛡 Protected Routes
-- 🗄 SQLite Database
-- ⚡ SQLAlchemy ORM
-- 📚 Swagger API Documentation
+- 🔑 Bearer Token Authentication
+- 🚫 Invalid / Expired Token Handling
+
+## 👤 User Management
+
+- 👤 View Current User
+- ✏️ Update Profile
+- 🗑️ Delete Account
+- ✅ Unique Username Validation
+- ✅ Unique Email Validation
+- 📋 Request Validation
 - ❌ Proper Error Handling
+
+## ⚙️ Configuration & Production Practices
+
+- 🌱 Environment Variables
+- 🔐 `.env` Configuration
+- 🔑 Secret Key Management
+- 📝 Application Logging
+- 📦 Requirements Management
+- 🚫 Sensitive Files excluded through `.gitignore`
+
+## 📚 API
+
+- ⚡ FastAPI REST API
+- 📖 Swagger UI
+- 📘 ReDoc
+- 💉 Dependency Injection
+- 🗄️ SQLAlchemy ORM
+- 🗃️ SQLite Database
 
 ---
 
 # 🛠 Tech Stack
 
 | Category | Technology |
-|----------|------------|
+|---|---|
 | Language | Python |
 | Framework | FastAPI |
 | Database | SQLite |
 | ORM | SQLAlchemy |
 | Validation | Pydantic |
 | Password Hashing | Passlib + bcrypt |
-| Authentication | JWT (python-jose) |
-| API Documentation | Swagger UI |
+| Authentication | JWT |
+| JWT Library | python-jose |
+| Configuration | python-dotenv |
+| Server | Uvicorn |
+| API Documentation | Swagger UI / ReDoc |
+| Client | Tkinter Desktop GUI |
 
 ---
 
@@ -55,83 +101,136 @@ This project was built as part of my **AI Developer Roadmap** to strengthen my b
 ```text
 AuthenticationAPI/
 │
-├── auth.py              # Password hashing & JWT functions
-├── database.py          # Database configuration
-├── models.py            # SQLAlchemy models
+├── auth.py              # Password hashing & JWT authentication
+├── config.py            # Environment-based configuration
+├── database.py          # Database configuration & sessions
+├── logging_config.py    # Application logging configuration
+├── models.py            # SQLAlchemy database models
 ├── routes.py            # API routes
 ├── schemas.py           # Pydantic schemas
 ├── main.py              # FastAPI application
-├── users.db             # SQLite database
-├── requirements.txt
+│
+├── requirements.txt     # Python dependencies
+├── .gitignore           # Ignored files
+├── .env                 # Local environment variables
 └── README.md
 ```
+
+> ⚠️ `.env` and the SQLite database are intentionally excluded from GitHub.
 
 ---
 
 # 🔄 Authentication Flow
 
+## Registration
+
 ```text
-User Registers
-       │
-       ▼
-Password Hashed (bcrypt)
-       │
-       ▼
-Store User in SQLite
-       │
-──────────────────────────────
-       │
-User Logs In
-       │
-       ▼
+User
+ │
+ ▼
+POST /register
+ │
+ ▼
+Validate Input
+ │
+ ▼
+Hash Password
+ │
+ ▼
+bcrypt
+ │
+ ▼
+Store User
+ │
+ ▼
+SQLite Database
+```
+
+---
+
+## Login
+
+```text
+User
+ │
+ ▼
+POST /login
+ │
+ ▼
+Find User
+ │
+ ▼
 Verify Password
-       │
-       ▼
-Generate JWT Token
-       │
-       ▼
+ │
+ ▼
+Generate JWT
+ │
+ ▼
 Return Access Token
-       │
-──────────────────────────────
-       │
-Protected Route
-       │
-       ▼
+```
+
+---
+
+## Protected Request
+
+```text
+Desktop GUI
+ │
+ ▼
+GET /me
+ │
+ ▼
 Authorization: Bearer <JWT>
-       │
-       ▼
-Verify JWT
-       │
-       ▼
-Access Granted
+ │
+ ▼
+FastAPI
+ │
+ ▼
+Decode JWT
+ │
+ ▼
+Verify Signature
+ │
+ ▼
+Check Expiration
+ │
+ ▼
+Find User
+ │
+ ▼
+Return User
 ```
 
 ---
 
 # 📌 API Endpoints
 
-## 🏠 Home
+## 🏠 General
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/` | API Welcome Message |
+| Method | Endpoint | Authentication | Description |
+|---|---|---|---|
+| GET | `/` | ❌ | API welcome message |
 
 ---
 
 ## 👤 Authentication
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/register` | Register a new user |
-| POST | `/login` | Login and receive JWT |
+| Method | Endpoint | Authentication | Description |
+|---|---|---|---|
+| POST | `/register` | ❌ | Register a new user |
+| POST | `/login` | ❌ | Login and receive JWT |
 
 ---
 
-## 🔒 Protected
+## 🔒 User Management
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/profile` | Access protected user profile |
+| Method | Endpoint | Authentication | Description |
+|---|---|---|---|
+| GET | `/me` | ✅ | Get current authenticated user |
+| PUT | `/profile` | ✅ | Update current user's profile |
+| DELETE | `/account` | ✅ | Delete current user's account |
+
+> 🔑 Protected endpoints require a valid JWT Bearer token.
 
 ---
 
@@ -164,28 +263,115 @@ Access Granted
 
 ```json
 {
-  "access_token": "eyJhbGcOiJIUzI1NiIs...",
+  "access_token": "eyJhbGciOiJIUzI1NiIs...",
   "token_type": "bearer"
 }
 ```
 
 ---
 
-# 🚀 Installation
+# 🔑 Using the JWT
 
-## Clone Repository
+After logging in, the client receives an access token.
 
-```bash
-git clone https://github.com/YOUR_USERNAME/AuthenticationAPI.git
+Protected requests send:
+
+```http
+Authorization: Bearer <access_token>
 ```
 
+For example:
+
+```http
+GET /me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+```
+
+The API verifies the token before allowing access.
+
+---
+
+# 🔐 Password Security
+
+Passwords are **never stored directly** in the database.
+
+Instead:
+
+```text
+Plain Password
+      ↓
+    bcrypt
+      ↓
+Salt + Hash
+      ↓
+SQLite
+```
+
+During login:
+
+```text
+Entered Password
+      ↓
+bcrypt Verification
+      ↓
+Stored Password Hash
+      ↓
+Match?
+   ↙      ↘
+ YES      NO
+  ↓        ↓
+Login    Reject
+```
+
+This means the original password does not need to be stored.
+
+---
+
+# ⚙️ Environment Variables
+
+Sensitive configuration is stored in `.env`.
+
+Example:
+
+```env
+DATABASE_URL=sqlite:///./users.db
+
+SECRET_KEY=your-secret-key
+
+JWT_SECRET=your-jwt-secret
+
+API_KEY=your-api-key
+
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+```
+
+The application loads these values through the configuration system.
+
+### 🔒 Security
+
+`.env` is included in `.gitignore` and should **never be committed to GitHub**.
+
+---
+
+# 🚀 Installation
+
+## 1️⃣ Clone Repository
+
 ```bash
-cd AuthenticationAPI
+git clone https://github.com/AboobakerSiddique/FastAPI-Authentication-System.git
 ```
 
 ---
 
-## Create Virtual Environment
+## 2️⃣ Navigate to API
+
+```bash
+cd FastAPI-Authentication-System
+```
+
+---
+
+## 3️⃣ Create Virtual Environment
 
 ### Windows
 
@@ -193,15 +379,21 @@ cd AuthenticationAPI
 python -m venv .venv
 ```
 
-Activate
+Activate:
 
 ```powershell
 .venv\Scripts\Activate.ps1
 ```
 
+If PowerShell execution policy prevents activation, use Command Prompt:
+
+```cmd
+.venv\Scripts\activate.bat
+```
+
 ---
 
-## Install Dependencies
+## 4️⃣ Install Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -209,73 +401,326 @@ pip install -r requirements.txt
 
 ---
 
-## Run Server
+# 🧪 Run Locally
+
+Start the development server:
 
 ```bash
 uvicorn main:app --reload
+```
+
+The API will be available at:
+
+```text
+http://127.0.0.1:8000
 ```
 
 ---
 
 # 📖 API Documentation
 
-Swagger UI
+FastAPI automatically generates interactive API documentation.
+
+### Swagger UI
 
 ```text
 http://127.0.0.1:8000/docs
 ```
 
-ReDoc
+### ReDoc
 
 ```text
 http://127.0.0.1:8000/redoc
 ```
 
+Swagger can be used to test:
+
+- Registration
+- Login
+- JWT authentication
+- Protected routes
+- Profile updates
+- Account deletion
+
+---
+
+# 🖥️ Desktop GUI
+
+This API is also connected to a separate **Tkinter Desktop GUI**.
+
+```text
+┌──────────────────────┐
+│   Tkinter Desktop    │
+│        GUI           │
+└──────────┬───────────┘
+           │
+           │ HTTP Requests
+           │ + JWT
+           ▼
+┌──────────────────────┐
+│      FastAPI         │
+│       REST API       │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│      SQLAlchemy      │
+│        + SQLite      │
+└──────────────────────┘
+```
+
+The GUI allows users to:
+
+- Register
+- Login
+- View Dashboard
+- View Profile
+- Edit Profile
+- Delete Account
+- Logout
+
+---
+
+# ☁️ Deployment
+
+This API is being prepared for deployment using **Render**.
+
+### Production Start Command
+
+```bash
+uvicorn main:app --host 0.0.0.0 --port $PORT
+```
+
+### Build Command
+
+```bash
+pip install -r requirements.txt
+```
+
+### Deployment Architecture
+
+```text
+GitHub
+   │
+   ▼
+Render
+   │
+   ▼
+FastAPI
+   │
+   ▼
+SQLAlchemy
+   │
+   ▼
+SQLite
+```
+
+Environment variables such as:
+
+```text
+DATABASE_URL
+SECRET_KEY
+JWT_SECRET
+API_KEY
+ACCESS_TOKEN_EXPIRE_MINUTES
+```
+
+are configured directly in the Render dashboard rather than committed to GitHub.
+
+> ⚠️ SQLite is being used here for learning and deployment practice. A production application would generally use a persistent database such as PostgreSQL.
+
 ---
 
 # 🔐 Security Features
 
-- Passwords are hashed using **bcrypt**
-- Plain-text passwords are **never stored**
-- JWT tokens are digitally signed
-- Protected endpoints require authentication
-- Invalid or expired tokens are rejected
-- Duplicate usernames and emails are prevented
+- 🔒 Passwords hashed using bcrypt
+- 🚫 Plain-text passwords never stored
+- 🎫 JWT tokens digitally signed
+- ⏳ JWT expiration
+- 🛡 Protected endpoints
+- 🔑 Bearer authentication
+- 🚫 Invalid/expired tokens rejected
+- ✅ Duplicate username prevention
+- ✅ Duplicate email prevention
+- 🌱 Secrets stored through environment variables
+- 🚫 `.env` excluded from Git
+- 📝 Authentication events logged without exposing passwords or tokens
 
 ---
 
+# 🧠 Concepts Learned
 
-# 🎯 Learning Outcomes
+Through this project, I learned and implemented:
 
-Through this project, I learned:
+### Python
 
-- FastAPI fundamentals
+- Functions
+- Modules
+- Virtual Environments
+- Environment Variables
+- Exception Handling
+- Logging
+
+### FastAPI
+
+- REST APIs
+- Routing
+- Request/Response Handling
+- Dependency Injection
+- Pydantic Validation
+- HTTP Status Codes
+- Error Handling
+- OAuth2PasswordBearer
+- Protected Routes
+- Swagger Documentation
+- ReDoc
+
+### Database
+
+- SQLite
 - SQLAlchemy ORM
-- SQLite database integration
-- Password hashing with bcrypt
-- JWT authentication
-- Protected API routes
-- API testing with Swagger
-- Authentication workflow
+- Database Models
+- Database Sessions
+- CRUD Operations
+- Querying
+- Unique Constraints
+
+### Authentication
+
+- Authentication vs Authorization
+- Password Hashing
+- bcrypt
+- Salt
+- Hash Verification
+- JWT
+- Access Tokens
+- Token Expiration
+- Bearer Tokens
+- Protected Endpoints
+
+### Deployment
+
+- GitHub Integration
+- Environment Variables
+- Build Commands
+- Start Commands
+- Deployment Logs
+- Production Server Configuration
 
 ---
 
-# 🚧 Future Improvements
+# 🚧 Current Limitations
+
+This project intentionally focuses on authentication fundamentals.
+
+It currently does not include:
 
 - Refresh Tokens
-- Role-Based Access Control (RBAC)
-- Email Verification
 - Password Reset
-- Environment Variables (.env)
-- Docker Support
-- Unit Testing
-- PostgreSQL Integration
+- Email Verification
+- Role-Based Access Control
+- Admin Permissions
+- OAuth / Google Login
+- Rate Limiting
+- Automated Testing
+- PostgreSQL
+- Docker
+- HTTPS configuration
+
+---
+
+# 🚀 Future Improvements
+
+Planned improvements:
+
+- 🔄 Refresh Token System
+- 🔑 Change Password
+- 📧 Email Verification
+- 🔐 Forgot Password
+- 👑 Role-Based Access Control
+- 🛡️ Admin Dashboard
+- 🚦 Rate Limiting
+- 🧪 Automated Testing with Pytest
+- 🐘 PostgreSQL
+- 🐳 Docker
+- ☁️ Production Deployment
+- 🔑 OAuth / Google Authentication
+- 🌐 React Web Frontend
+
+---
+
+# 🎯 Learning Outcome
+
+This project helped me understand authentication as a complete system rather than just implementing a login endpoint.
+
+I learned how:
+
+```text
+User
+ ↓
+Registration
+ ↓
+Password Hashing
+ ↓
+Database
+ ↓
+Login
+ ↓
+Password Verification
+ ↓
+JWT
+ ↓
+Bearer Token
+ ↓
+Protected API
+ ↓
+Authenticated User
+```
+
+I also learned how a separate desktop application can communicate with a REST API and handle authentication using JWT.
+
+Most importantly, I gained practical experience debugging real API authentication problems involving:
+
+- JWT tokens
+- Authorization headers
+- Token expiration
+- JSON requests
+- API responses
+- Environment variables
+- GUI ↔ API communication
+- Configuration issues
+
+---
+
+# 📈 Part of My AI Developer Roadmap
+
+This project is part of my structured journey toward becoming an **AI Developer**.
+
+```text
+Python
+   ↓
+Git & GitHub
+   ↓
+APIs
+   ↓
+FastAPI
+   ↓
+Databases
+   ↓
+Authentication
+   ↓
+Deployment
+   ↓
+Backend Engineering
+   ↓
+AI / LLM Development
+```
 
 ---
 
 # 🤝 Connect With Me
 
-**GitHub**
+### GitHub
 
 https://github.com/AboobakerSiddique
 
@@ -283,12 +728,25 @@ https://github.com/AboobakerSiddique
 
 # ⭐ Support
 
-If you found this project helpful, consider giving it a ⭐ on GitHub.
+If you found this project useful, consider giving it a ⭐ on GitHub.
 
-It motivates me to continue building and documenting my journey toward becoming an AI Engineer.
+It motivates me to continue building, learning, and documenting my journey toward becoming an **AI Engineer**.
 
 ---
 
-## 🚀 Built as part of my AI Developer Roadmap
+## 🚀 Built. Tested. Deployed.
 
-> *"Learn consistently. Build real projects. Share your journey."*
+> *Learn consistently. Build real projects. Share your journey.*
+
+---
+
+### 📌 Project Status
+
+**🟢 Development:** Complete  
+**🟢 Authentication:** Complete  
+**🟢 GUI Integration:** Complete  
+**🟢 Configuration:** Complete  
+**🟢 Logging:** Complete  
+**🟡 Deployment:** In Progress  
+**⚪ PostgreSQL:** Future  
+**⚪ Automated Testing:** Future

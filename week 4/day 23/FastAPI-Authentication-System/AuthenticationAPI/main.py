@@ -6,7 +6,7 @@ from routes import router
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="Authentication API",
+    title="FastAPI Authentication System",
     description="A secure user authentication system built with FastAPI, featuring password hashing, JWT authentication, protected routes, and SQLite database.",
     version="1.0.0"
 )
