@@ -14,9 +14,26 @@ positive
 negative
 neutral
 
+Examples:
+
+Review:
+"The app is fantastic and very user-friendly!"
+Category: positive
+
+Review:
+"The application crashes whenever I upload a PDF."
+Category: negative
+
+Review:
+"I cannot change the email associated with my account."
+Category: negative
+
+Review:
+"This app is okay, but it could use some improvements."
+Category: neutral
 
 
-classify:
+Now classify:
 
 Review:
 "The phone looks great, but the battery dies very quickly."

@@ -20,7 +20,7 @@ if not api_key:
     print("ERROR: GEMINI_API_KEY not found in .env")
     exit()
 
-# Initialize client
+2# Initialize client
 client = genai.Client(api_key=api_key)
 
 MODEL = "gemini-3.1-flash-lite"
