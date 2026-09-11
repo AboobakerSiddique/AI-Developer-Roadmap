@@ -1,0 +1,29 @@
+🚀 **Built: Fitscope — AI Resume Analyzer**
+
+I recently built **Fitscope**, an AI-powered resume analysis tool that evaluates how well a candidate's profile matches a specific job description.
+
+Instead of relying on simple keyword matching, Fitscope analyzes the context of both documents and provides:
+
+• 📄 Resume & Job Description PDF/Text input
+• 🎯 Overall compatibility score
+• ✅ Matched skills
+• ❌ Missing skills
+• 💪 Strengths & weaknesses
+• 📊 Requirement-by-requirement match breakdown
+• 💡 AI-generated recommendation
+
+### Tech Stack
+
+**Python • FastAPI • LangChain • Gemini • Pydantic • Next.js • TypeScript • Tailwind CSS**
+
+The project helped me put **structured LLM output, Pydantic validation, document processing, and AI application development** into practice.
+
+It's now live 👇
+
+🌐 **Live Demo:** https://frontend-ten-fitscope.vercel.app/
+
+💻 **GitHub:** https://github.com/AboobakerSiddique/AI-Resume-Analyzer
+
+This is another step in my journey toward building production-oriented **AI applications and Python backend systems**.
+
+#AI #GenerativeAI #LangChain #Python #FastAPI #Gemini #NextJS #Pydantic #AIEngineering #SoftwareDevelopment 
