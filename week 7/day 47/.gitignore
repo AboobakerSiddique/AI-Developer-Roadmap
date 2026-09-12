@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+.env
+documents/*
+week 7\day 47\venv
+day 47\venv
+venv
