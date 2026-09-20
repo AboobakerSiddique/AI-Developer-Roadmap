@@ -1,0 +1,302 @@
+October
+Main objective:
+Build high-value foundations.
+Week 1
+
+Engineering Mathematics
+
+Linear Algebra
+Matrices
+Rank
+Eigenvalues/eigenvectors
+Linear equations
+
+General Aptitude
+
+Percentages
+Ratios
+Basic numerical reasoning
+
+Network Theory
+
+KCL/KVL
+Node analysis
+Mesh analysis
+Source transformation
+Superposition
+Week 2
+
+Network Theory
+
+Thevenin
+Norton
+Maximum power transfer
+Reciprocity
+Sinusoidal steady state
+Phasors
+Complex power
+
+Maths
+
+Differential equations
+
+Aptitude
+
+Data interpretation
+Week 3
+
+Signals & Systems
+
+Signal properties
+LTI systems
+Causality
+Stability
+Impulse response
+Convolution
+
+Maths
+
+Differential + integral calculus
+Week 4
+
+Signals
+
+Fourier series
+Fourier transform
+Sampling
+Z-transform
+
+Maths
+
+Probability basics
+
+Aptitude
+
+Logical reasoning
+End-of-October target
+
+You should have:
+
+Maths: ~50–60% of high-value material
+
+Aptitude: ~40–50%
+
+Networks: ~70–80%
+
+Signals: ~60–70%
+
+And most importantly:
+
+PYQs solved for the topics you've completed.
+
+Not just lectures.
+
+5. November
+
+This becomes your Digital + Communication month.
+
+These two subjects deserve serious attention because Communication has historically been around the ~10–14 mark region, while Digital has often been ~8–11.
+
+Week 1–2
+Digital
+Number systems
+Boolean algebra
+K-maps
+Logic gates
+CMOS
+MUX
+Decoder
+Arithmetic circuits
+
+Then:
+
+Latches
+Flip-flops
+Counters
+Shift registers
+FSM
+Week 3–4
+Communication
+
+Start with:
+
+Random processes
+Autocorrelation
+PSD
+Noise
+AM
+FM
+Demodulation
+Superheterodyne receiver
+
+Then:
+
+Information theory
+Entropy
+Mutual information
+Channel capacity
+
+Then:
+
+PCM
+DPCM
+ASK
+PSK
+FSK
+QAM
+BER
+SNR
+Matched filter
+ML/MAP detection
+November parallel work
+
+Every week:
+
+Maths — 2 sessions
+
+Aptitude — 3 sessions
+
+Previous subjects — 1 revision session
+
+This prevents October material from disappearing.
+
+6. December
+
+Now we attack:
+
+Control + Analog + EDC
+Control
+
+This is a relatively compact subject compared with its potential marks.
+
+Focus heavily on:
+
+Transfer functions
+Block diagrams
+Signal flow graphs
+Time response
+Steady-state error
+Routh-Hurwitz
+Bode plots
+Root locus
+Nyquist
+Stability
+PID
+State-space basics
+
+This is one subject where good problem practice can pay off quickly.
+
+Analog
+
+Focus on:
+
+Diodes
+Rectifiers
+Clippers
+Clampers
+BJT
+Biasing
+Small signal
+Amplifiers
+Frequency response
+MOSFET
+Biasing
+Small signal
+Amplifiers
+Op-amps
+Amplifiers
+Integrators
+Differentiators
+Active filters
+Schmitt trigger
+Oscillators
+Differential amplifiers + current mirrors
+
+Don't get buried in transistor-level details that aren't producing PYQ returns.
+
+EDC
+
+Focus on:
+
+Semiconductor fundamentals
+Carrier concentration
+Drift/diffusion
+PN junction
+Zener
+BJT fundamentals
+MOS capacitor
+MOSFET
+LED
+Photodiode
+Solar cell
+
+Again:
+
+PYQs determine depth.
+
+7. January is NOT another syllabus month
+
+This is where I strongly disagree with a traditional "finish syllabus in January" plan.
+
+By January, your objective should shift to:
+
+PYQ + Revision + Tests
+
+You should have already touched the high-value portions of:
+
+Maths
+Aptitude
+Networks
+Signals
+Digital
+Communication
+Control
+Analog
+EDC
+EMT
+
+But not necessarily 100% of every tiny syllabus bullet.
+
+8. What about Electromagnetics?
+
+I'd put EMT mainly into:
+
+December + January
+
+because it has good historical weightage but can consume a lot of time if studied from textbook depth.
+
+Prioritize:
+
+Transmission Lines
+
+⭐⭐⭐
+
+Plane Waves
+
+⭐⭐⭐
+
+Maxwell equations
+
+⭐⭐⭐
+
+Waveguides
+
+⭐⭐
+
+Smith Chart
+
+⭐⭐⭐
+
+Reflection/refraction
+
+⭐⭐
+
+Antennas
+
+⭐⭐
+
+Optical fiber
+
+⭐–⭐⭐
+
+Don't spend enormous amounts of time trying to master every derivation.
