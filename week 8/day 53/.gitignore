@@ -1,0 +1,4 @@
+chroma_db/chroma.sqlite3
+chroma_db
+chroma
+__pycache__/
