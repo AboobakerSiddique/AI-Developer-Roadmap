@@ -3,12 +3,15 @@ import tempfile
 from pathlib import Path
 
 import streamlit as st
-from google import genai
 
-from loader import load_document
-from chunker import recursive_split
-from embeddings import get_embedding
-from vector_store import VectorStore
+from langchain_rag import (
+    load_as_langchain_documents,
+    split_documents,
+    reset_vectorstore,
+    create_vectorstore,
+    create_retriever,
+    create_rag_chain
+)
 
 
 # --------------------------------------------------
@@ -16,26 +19,10 @@ from vector_store import VectorStore
 # --------------------------------------------------
 
 st.set_page_config(
-    page_title="Semantic Document Search",
+    page_title="LangChain RAG",
     page_icon="⌕",
     layout="wide"
 )
-
-
-# --------------------------------------------------
-# GEMINI CLIENT
-# --------------------------------------------------
-
-client = genai.Client(
-    api_key=os.environ["GEMINI_API_KEY"]
-)
-
-
-# --------------------------------------------------
-# VECTOR STORE
-# --------------------------------------------------
-
-store = VectorStore()
 
 
 # --------------------------------------------------
@@ -51,15 +38,22 @@ if "indexed_file" not in st.session_state:
 if "chunk_count" not in st.session_state:
     st.session_state.chunk_count = 0
 
+if "retriever" not in st.session_state:
+    st.session_state.retriever = None
+
+if "rag_chain" not in st.session_state:
+    st.session_state.rag_chain = None
+
 
 # --------------------------------------------------
 # HEADER
 # --------------------------------------------------
 
-st.title("Semantic Document Search")
+st.title("LangChain RAG")
 
 st.caption(
-    "Gemini embeddings + ChromaDB + grounded question answering"
+    "Document retrieval and question answering "
+    "with LangChain + Gemini + Chroma"
 )
 
 
@@ -88,7 +82,7 @@ with st.sidebar:
 
 
 # --------------------------------------------------
-# DOCUMENT INDEXING
+# INDEX DOCUMENT
 # --------------------------------------------------
 
 if uploaded_file:
@@ -116,102 +110,65 @@ if uploaded_file:
         try:
 
             with st.spinner(
-                "Reading and indexing document..."
+                "Processing document..."
             ):
 
                 # ------------------------------------------
-                # 1. CLEAR PREVIOUS DOCUMENT
+                # 1. CLEAR PREVIOUS LANGCHAIN STORE
                 # ------------------------------------------
 
-                store.clear()
+                reset_vectorstore()
 
                 # ------------------------------------------
-                # 2. LOAD DOCUMENT
+                # 2. LOAD
                 # ------------------------------------------
 
-                documents = load_document(
-                    temp_path
+                documents = (
+                    load_as_langchain_documents(
+                        temp_path
+                    )
                 )
 
                 # ------------------------------------------
-                # 3. CHUNK DOCUMENT
+                # 3. SPLIT
                 # ------------------------------------------
 
-                all_chunks = []
+                chunks = split_documents(
+                    documents
+                )
 
-                for document in documents:
-
-                    chunks = recursive_split(
-                        document["content"],
-                        chunk_size=500
-                    )
-
-                    for chunk_index, chunk in enumerate(
-                        chunks
-                    ):
-
-                        all_chunks.append({
-                            "text": chunk,
-                            "source": uploaded_file.name,
-                            "chunk_id": chunk_index,
-                            "metadata": document["metadata"]
-                        })
-
-                if not all_chunks:
+                if not chunks:
                     st.error(
-                        "No readable text was found in "
-                        "the uploaded document."
+                        "No readable text was found."
                     )
-
                     st.stop()
 
                 # ------------------------------------------
-                # 4. PREPARE DATA
+                # 4. EMBED + STORE
                 # ------------------------------------------
 
-                ids = [
-                    f"chunk_{index}"
-                    for index in range(
-                        len(all_chunks)
-                    )
-                ]
-
-                texts = [
-                    chunk["text"]
-                    for chunk in all_chunks
-                ]
-
-                metadatas = [
-                    {
-                        "source": chunk["source"],
-                        "chunk_id": chunk["chunk_id"],
-                        **chunk["metadata"]
-                    }
-                    for chunk in all_chunks
-                ]
-
-                # ------------------------------------------
-                # 5. CREATE EMBEDDINGS
-                # ------------------------------------------
-
-                embeddings = [
-                    get_embedding(text)
-                    for text in texts
-                ]
-
-                # ------------------------------------------
-                # 6. STORE IN CHROMA
-                # ------------------------------------------
-
-                store.add_documents(
-                    ids=ids,
-                    documents=texts,
-                    embeddings=embeddings,
-                    metadatas=metadatas
+                vectorstore = create_vectorstore(
+                    chunks
                 )
 
                 # ------------------------------------------
-                # UPDATE SESSION STATE
+                # 5. CREATE RETRIEVER
+                # ------------------------------------------
+
+                retriever = create_retriever(
+                    vectorstore
+                )
+
+                # ------------------------------------------
+                # 6. CREATE RAG CHAIN
+                # ------------------------------------------
+
+                rag_chain = create_rag_chain(
+                    retriever
+                )
+
+                # ------------------------------------------
+                # SESSION STATE
                 # ------------------------------------------
 
                 st.session_state.indexed = True
@@ -221,12 +178,19 @@ if uploaded_file:
                 )
 
                 st.session_state.chunk_count = (
-                    len(all_chunks)
+                    len(chunks)
+                )
+
+                st.session_state.retriever = (
+                    retriever
+                )
+
+                st.session_state.rag_chain = (
+                    rag_chain
                 )
 
             st.success(
-                f"Successfully indexed "
-                f"{len(all_chunks)} chunks."
+                f"Indexed {len(chunks)} chunks."
             )
 
         except Exception as error:
@@ -237,7 +201,6 @@ if uploaded_file:
 
         finally:
 
-            # Remove temporary file
             try:
                 os.remove(temp_path)
             except OSError:
@@ -245,18 +208,18 @@ if uploaded_file:
 
 
 # --------------------------------------------------
-# SEARCH / QUESTION ANSWERING
+# QUESTION ANSWERING
 # --------------------------------------------------
 
 st.divider()
 
 st.subheader("Ask your document")
 
+
 if not st.session_state.indexed:
 
     st.info(
-        "Upload a document and index it before "
-        "asking a question."
+        "Upload and index a document first."
     )
 
 else:
@@ -264,127 +227,51 @@ else:
     query = st.text_input(
         "Question",
         placeholder=(
-            "e.g. What is the main purpose of "
-            "this document?"
+            "e.g. What is the main purpose "
+            "of this document?"
         )
     )
 
     if query:
 
+        # ------------------------------------------
+        # RETRIEVE
+        # ------------------------------------------
+
         with st.spinner(
-            "Searching document..."
+            "Retrieving relevant context..."
         ):
 
-            # ------------------------------------------
-            # 1. EMBED QUESTION
-            # ------------------------------------------
-
-            query_embedding = get_embedding(
-                query
-            )
-
-            # ------------------------------------------
-            # 2. RETRIEVE TOP-K CHUNKS
-            # ------------------------------------------
-
-            results = store.search(
-                query_embedding,
-                top_k=3
-            )
-
-        documents = results["documents"][0]
-        metadatas = results["metadatas"][0]
-        distances = results["distances"][0]
-
-        # ------------------------------------------
-        # 3. BUILD CONTEXT
-        # ------------------------------------------
-
-        context_parts = []
-
-        for index, document in enumerate(
-            documents
-        ):
-
-            metadata = metadatas[index]
-
-            source = metadata.get(
-                "source",
-                "Unknown"
-            )
-
-            page = metadata.get(
-                "page"
-            )
-
-            if page:
-                location = (
-                    f"{source}, Page {page}"
+            retrieved_docs = (
+                st.session_state.retriever.invoke(
+                    query
                 )
-            else:
-                location = source
-
-            context_parts.append(
-                f"[Source: {location}]\n"
-                f"{document}"
             )
 
-        context = "\n\n---\n\n".join(
-            context_parts
-        )
-
         # ------------------------------------------
-        # 4. ASK GEMINI
+        # GENERATE ANSWER
         # ------------------------------------------
-
-        prompt = f"""
-You are a document question-answering assistant.
-
-Answer the user's question using ONLY the
-provided document context.
-
-If the answer cannot be found in the context,
-say:
-
-"I couldn't find that information in the document."
-
-Do not invent information.
-
-Keep the answer concise and directly answer
-the question.
-
-DOCUMENT CONTEXT:
-----------------
-
-{context}
-
-----------------
-
-USER QUESTION:
-{query}
-"""
 
         with st.spinner(
-            "Generating grounded answer..."
+            "Generating answer..."
         ):
 
-            response = client.models.generate_content(
-                model="gemini-3.6-flash",
-                contents=prompt
+            answer = (
+                st.session_state.rag_chain.invoke(
+                    query
+                )
             )
 
         # ------------------------------------------
-        # 5. DISPLAY ANSWER
+        # ANSWER
         # ------------------------------------------
 
         st.subheader("Answer")
 
-        st.write(
-            response.text
-        )
+        st.write(answer)
 
         # ------------------------------------------
-        # 6. RETRIEVAL INSPECTOR
+        # SOURCES
         # ------------------------------------------
 
         st.divider()
@@ -394,23 +281,20 @@ USER QUESTION:
         )
 
         st.caption(
-            "These are the Top-K chunks used to "
-            "generate the answer."
+            "Top-K documents retrieved by "
+            "the LangChain retriever."
         )
 
         for index, document in enumerate(
-            documents
+            retrieved_docs
         ):
 
-            metadata = metadatas[index]
-            distance = distances[index]
-
-            source = metadata.get(
+            source = document.metadata.get(
                 "source",
                 "Unknown"
             )
 
-            page = metadata.get(
+            page = document.metadata.get(
                 "page"
             )
 
@@ -428,24 +312,11 @@ USER QUESTION:
                 border=True
             ):
 
-                col1, col2 = st.columns(
-                    [5, 1]
+                st.markdown(
+                    f"**{index + 1}. "
+                    f"{location}**"
                 )
 
-                with col1:
-
-                    st.markdown(
-                        f"**{index + 1}. "
-                        f"{location}**"
-                    )
-
-                with col2:
-
-                    st.caption(
-                        f"Distance: "
-                        f"{distance:.4f}"
-                    )
-
                 st.write(
-                    document
+                    document.page_content
                 )
